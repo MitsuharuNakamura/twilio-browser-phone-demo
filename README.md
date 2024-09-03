@@ -133,16 +133,17 @@ Twilio-Browser-Phone-Demo
     Functions:
     https://twilio-browser-phone-demo-xxxxxx-dev.twil.io/sync-token
     https://twilio-browser-phone-demo-xxxxxx-dev.twil.io/voice-call
-    https://twilio-browser-phone-demo-xxxxxx-dev.twil.io/voice-token
+    https://twilio-browser-phone-demo-xxxxxx-dev.twil.iovoice-token
     https://twilio-browser-phone-demo-xxxxxx-dev.twil.io/webhook
     Assets:
     https://twilio-browser-phone-demo-xxxxxx-dev.twil.io/index.html
     https://twilio-browser-phone-demo-xxxxxx-dev.twil.io/logo.png
-    ```
-11. TwiML Binの修正　　
-   1. コンソールから、Twiml Binsのメニューをクリックしてください　   
-   2. 先ほど作成した「Twilio-Browser-Phone-Demo」をクリックして下さい
-   3.  TWIML欄に下記のコードが表示されているとおもいます。  
+    ```  
+
+11. TwiML Binの修正  
+    1. コンソールから、Twiml Binsのメニューをクリックしてください　   
+    2. 先ほど作成した「Twilio-Browser-Phone-Demo」をクリックして下さい
+    3. TWIML欄に下記のコードが表示されているとおもいます。  
    ```xml  
     <?xml version="1.0" encoding="UTF-8"?>  
     <Response>  
@@ -163,11 +164,11 @@ Twilio-Browser-Phone-Demo
         </Start>  
         <Dial answerOnBridge="true" callerId="<コンソールで買った電話番号>">{{#e164}}{{To}}{{/e164}}</Dial>  
     </Response>  
-    ```  
-    4.  下記の箇所を修正してください。   
+   ```  
+     4.  下記の箇所を修正してください。   
        1. <Functions_domain_name>　の箇所にコードをデプロイした際に表示された、「twilio-browser-phone-demo-xxxxxx-dev.twil.io」  というドメインを置き換えて下さい。  
        2. 完了したら保存してください。
-12. 
+   
 
 
 ## デモの実行  
