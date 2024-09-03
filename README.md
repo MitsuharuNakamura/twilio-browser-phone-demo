@@ -143,7 +143,7 @@ Twilio-Browser-Phone-Demo
    1. コンソールから、Twiml Binsのメニューをクリックしてください　   
    2. 先ほど作成した「Twilio-Browser-Phone-Demo」をクリックして下さい
    3.  TWIML欄に下記のコードが表示されているとおもいます。  
-    ```xml  
+   ```xml  
     <?xml version="1.0" encoding="UTF-8"?>  
     <Response>  
         <Start>   
