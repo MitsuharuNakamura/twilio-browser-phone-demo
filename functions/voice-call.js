@@ -1,4 +1,6 @@
 // File: /voice-call.js
+// 現状未使用です。Twiml Binsを使わないと正常にReal Time Transcriptionが動作しなかったので、このコードは保留です。
+// 今後のために取っておきます
 exports.handler = function(context, event, callback) {
     const twiml = new Twilio.twiml.VoiceResponse();
     const start = twiml.start();

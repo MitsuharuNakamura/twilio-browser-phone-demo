@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ブラウザ電話デモ</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
-    <script type="text/javascript" src="//media.twiliocdn.com/sdk/js/sync/v3.2/twilio-sync.min.js"></script>
   
     <style>
         /* ページ全体のスタイル設定 */
@@ -122,32 +121,85 @@
             border-radius: 5px; /* 角を丸くする */
             display: inline-block; /* ブロック要素として表示 */
         }
+        /* 電話番号入力フィールドのスタイル */
+        #phone-number, #from-number {
+            padding: 15px; /* パディングを追加 */
+            font-size: 18px; /* フォントサイズを統一 */
+            width: 100%; /* 幅を100%に設定 */
+            margin-bottom: 20px; /* マージンを追加 */
+            border: 1px solid #ccc; /* ボーダーを追加 */
+            border-radius: 5px; /* 角を丸くする */
+        }    
     </style>
+    <script>
+        // パスワード認証を行う関数
+        function authenticate() {
+            const password = prompt("パスワードを入力してください:");
+
+            if (password) {
+                fetch('/authenticate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ password: password }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 認証成功時にindex.htmlの内容を表示
+                        document.getElementById('app').style.display = 'block';
+                    } else {
+                        alert("パスワードが間違っています。");
+                        authenticate(); // 再度認証を求める
+                    }
+                })
+                .catch(error => console.error('Error during authentication:', error));
+            } else {
+                alert("パスワードが入力されていません。");
+                authenticate(); // 再度認証を求める
+            }
+        }
+
+        // ページロード時に認証を開始
+        window.onload = function() {
+            authenticate();
+        };
+    </script>
 </head>
 <body>
+    <div id="app" style="display: none;">
+        <img src="logo.png" alt="ブラウザ電話デモ" style="max-width: 80%; height: auto;margin-bottom: 20px;" />
+        <!-- 電話番号選択フィールド -->
+        <label for="from-number">発信元電話番号:</label>
+        <select id="from-number"></select>
 
-    <img src="logo.png" alt="ブラウザ電話デモ" style="max-width: 100%; height: auto;margin-bottom: 20px;" />
-    <!-- 電話番号入力フィールド -->
-    <label for="phone-number">電話番号:</label>
-    <input type="text" id="phone-number" placeholder="Enter phone number" />
+        <!-- 電話番号入力フィールド -->
+        <label for="phone-number">電話番号:</label>
+        <input type="text" id="phone-number" placeholder="Enter phone number" />
 
-    <div id="controls">
-        <!-- コールボタン -->
-        <button id="call-button">Call</button>
-        <!-- ハングアップボタン -->
-        <button id="hangup-button">Hang Up</button>
+        <div id="controls">
+            <!-- コールボタン -->
+            <button id="call-button">Call</button>
+            <!-- ハングアップボタン -->
+            <button id="hangup-button">Hang Up</button>
+        </div>
+
+        <!-- ステータス表示 -->
+        <div id="status">Status: Ready</div>
+        <!-- Webhookデータ表示エリア -->
+        <label for="webhook-data-container">文字起こしメッセージ:</label>
+        <div id="webhook-data-container" class="message-container">
+            <!-- Webhookデータがここに表示されます -->
+        </div>
     </div>
 
-    <!-- ステータス表示 -->
-    <div id="status">Status: Ready</div>
-    <!-- Webhookデータ表示エリア -->
-    <label for="webhook-data-container">文字起こしメッセージ:</label>
-    <div id="webhook-data-container" class="message-container">
-        <!-- Webhookデータがここに表示されます -->
-    </div>
-  
-    <script src="//media.twiliocdn.com/sdk/js/client/v1.13/twilio.min.js"></script>
+    <script type="text/javascript" src="//media.twiliocdn.com/sdk/js/sync/v3.2/twilio-sync.min.js"></script>
+    <script type="text/javascript" src="//media.twiliocdn.com/sdk/js/client/v1.13/twilio.min.js"></script>
     <script>
+        /***************************************
+        ** 架電のための処理
+        ****************************************/
         let device;
         let callStatus = document.getElementById('status');
         let callButton = document.getElementById('call-button');
@@ -195,7 +247,9 @@
 
         // コールボタンがクリックされた時の処理
         callButton.onclick = function() {
-            const params = { To: document.getElementById('phone-number').value };
+            const fromNumber = document.getElementById('from-number').value; // 選択された発信元電話番号
+            const toNumber = document.getElementById('phone-number').value; // 入力された電話番号
+            const params = { To: toNumber, From: fromNumber }; // 発信元と宛先を設定
             device.connect(params);
         };
 
@@ -207,7 +261,30 @@
         // ページロード時にトークンを取得してデバイスをセットアップ
         getTokenAndSetup();
 
-        // 通話文字起こし関連の処理
+        /***************************************
+        ** 動的に利用可能な発信元電話番号を取得する処理
+        ****************************************/
+        // ページロード時に電話番号を取得して選択欄に追加
+        function loadPhoneNumbers() {
+            fetch('/get-phone-numbers')
+                .then(response => response.json())
+                .then(data => {
+                    const fromNumberSelect = document.getElementById('from-number');
+                    data.phoneNumbers.forEach(number => {
+                        const option = document.createElement('option');
+                        option.value = number.value;
+                        option.textContent = number.label;
+                        fromNumberSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching phone numbers:', error));
+        }
+        // ページロード時に電話番号を取得
+        loadPhoneNumbers();
+
+        /***************************************
+        ** 通話文字起こし関連の処理
+        ****************************************/
         const displayedData = new Set();
 
         // メッセージエリアをスクロールの最下部に移動させる関数

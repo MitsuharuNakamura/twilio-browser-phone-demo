@@ -15,30 +15,32 @@ Twilio-Browser-Phone-Demo
    │ └── voice-token.js  
    │ └── sync-token.js  
    │ └── voice-call.js  
-   │ └── webhook.js     
+   │ └── authenticate.js
+   │ └── get-phone-numbers.js    
+   │ └── webhook.js    
    ├── images/  
    ├── .env.examples
    └── README.md  
 </pre>  
-2. プロジェクトの初期化  
+1. プロジェクトの初期化  
    `cd ./Twilio-Browser-Phone-Demo/`  
    `twilio serverless:init`  
 
-3. AccountSID/Auth_Tokenの取得
+2. AccountSID/Auth_Tokenの取得
    1. TwilioのコンソールにログインしてHOME画面の下部にあるAccountSID/AUTH_TOKENを確認してください。  
    2. ローカルに展開したファイルに.env.examplesがあるのでファイルを開きます。  
    3. ファイル内に、「ACCOUNT_SID」「AUTH_TOKEN」とあるので、コンソールから取得した値を入力し保存してください。   
    
-4. API Keyの作成   
+3. API Keyの作成   
    1. [公式サイト](https://www.twilio.com/docs/iam/api-keys#create-an-api-key)で作成手順を確認    
    2. ローカルに展開したファイルに.env.examplesがあるのでファイルを開きます。  
    3. ファイル内に、「API_KEY」「API_SECRET」とあるので、作成したAPIKEYの情報をそれぞれの変数に設定してください。     
 
-5. 電話番号の購入  
+4. 電話番号の購入  
    1. 電話番号を購入して下さい。手順は[こちら](https://help.twilio.com/articles/223135247)です。  
    2. 購入した電話番号をenv.examplesのファイル内にある「TWILIO_PHONE_NUMBER」に設定して下さい。番号は+で始まるE164形式で記載してください。  
 
-6. Syncの作成　　
+5. Syncの作成　　
    1. Sync Serviceの生成
       1. 管理コンソールからSyncのメニューにアクセスします。
       2. Syncメニューの下にServicesというサブメニューがあるのでクリックします。
@@ -61,7 +63,7 @@ Twilio-Browser-Phone-Demo
       1. 「SYNC_SERVICE_SID」には、SyncサービスのSID（ISxxxxxxxxxx）を入れて下さい
       2. 「SYNC_DOCUMENT_NAME」には、Syncのドキュメント名（Twilio-Browser-Phone-Demo-Transcription）を入れて下さい。  
 
-7. TwiML Binの作成　
+6. TwiML Binの作成　
    1. コンソールから、Twiml Binsのメニューをクリックしてください　   
    2. Create New TwiMLボタンを押して下さい。
    3. FRIENDLY NAMEには、「Twilio-Browser-Phone-Demo」と入力します。
@@ -84,19 +86,18 @@ Twilio-Browser-Phone-Demo
             enableAutomaticPunctuation="true"  
             />  
         </Start>  
-        <Dial answerOnBridge="true" callerId="<コンソールで買った電話番号>">{{#e164}}{{To}}{{/e164}}</Dial>  
+        <Dial answerOnBridge="true" callerId="{{From}}">{{#e164}}{{To}}{{/e164}}</Dial>  
     </Response>  
     ```  
     5. XML内に２箇所修正する必要があります。  
        1. <Functions_domain_name>　こちらは、コードをデプロイした後に修正するので現状はそのままでOK。  
-       2. <コンソールで買った電話番号>　こちらには、コンソールで購入した電話番号をE164形式で置き換えて下さい。  
-8. TwiML Appの設定　　
+7. TwiML Appの設定　　
    1. コンソールからVoice→Maange→TwiML appsに遷移します。
    2. Create New TwiML Appボタンをクリックします。
    3. Friendly Nameには任意の名前を入れて下さい。
    4. Voice ConfigurationのRequest URLには、先程作成したTwiML BinsのURLを指定してください。
    5. Twiml appsのSIDを.env.examplesのファイル内にある、「TWIML_APPLICATION_SID」に設定して下さい。  
-9.  コードの修正　　
+8.  コードの修正　　
     1.  index.htmlの下記箇所で、もしSyncのドキュメント名を手順と異なる値にしていた場合には、こちらの「Twilio-Browser-Phone-Demo-Transcription」を変更してください。  
     ```js  
         syncClient.document('Twilio-Browser-Phone-Demo-Transcription').then(doc => {  
@@ -106,8 +107,9 @@ Twilio-Browser-Phone-Demo
                 addMessage(doc.data);  
             }  
     ```  
-    2. ```.env.eample```ファイルのファイル名を、```.env```に変更してください。  
-10. コードのデプロイ　　
+    2. env.examples内の「AUTHENTIOCATION_PASS」に任意の英数字をいれます。ここで指定したコードと画面から入力した認証コードが一致することで本機能を利用できます。
+    3. ```.env.eample```ファイルのファイル名を、```.env```に変更してください。  
+9.  コードのデプロイ　　
     1.  プロジェクトホームへ移動
     ```shell-session
     $ cd ./Twilio-Browser-Phone-Demo  
@@ -131,16 +133,18 @@ Twilio-Browser-Phone-Demo
     View Live Logs:
     https://www.twilio.com/console/functions/editor/ZS86ff05dad53e67160470087e4e839a22/environment/ZEdb3dd4975995d1f59cdb0391b0c8ce99
     Functions:
-    https://twilio-browser-phone-demo-xxxxxx-dev.twil.io/sync-token
-    https://twilio-browser-phone-demo-xxxxxx-dev.twil.io/voice-call
-    https://twilio-browser-phone-demo-xxxxxx-dev.twil.iovoice-token
-    https://twilio-browser-phone-demo-xxxxxx-dev.twil.io/webhook
+      https://twilio-browser-phone-demo-8112-dev.twil.io/authenticate
+      https://twilio-browser-phone-demo-8112-dev.twil.io/get-phone-numbers
+      https://twilio-browser-phone-demo-8112-dev.twil.io/sync-token
+      https://twilio-browser-phone-demo-8112-dev.twil.io/voice-call
+      https://twilio-browser-phone-demo-8112-dev.twil.io/voice-token
+      https://twilio-browser-phone-demo-8112-dev.twil.io/webhook
     Assets:
-    https://twilio-browser-phone-demo-xxxxxx-dev.twil.io/index.html
-    https://twilio-browser-phone-demo-xxxxxx-dev.twil.io/logo.png
+      https://twilio-browser-phone-demo-8112-dev.twil.io/index.html
+      https://twilio-browser-phone-demo-8112-dev.twil.io/logo.png
     ```  
 
-11. TwiML Binの修正  
+10. TwiML Binの修正  
     1. コンソールから、Twiml Binsのメニューをクリックしてください　   
     2. 先ほど作成した「Twilio-Browser-Phone-Demo」をクリックして下さい
     3. TWIML欄に下記のコードが表示されているとおもいます。  
@@ -172,11 +176,13 @@ Twilio-Browser-Phone-Demo
 
 
 ## デモの実行  
-1. ブラウザでトップ画面を開く  
-コードをデプロイした際に表示された、index.htmlのURLにブラウザでアクセスして下さい。  
-例えば、こちらです。  xxxxxxの部分はデプロイした人ごとに異なります。  
+1. ブラウザでトップ画面を開くと認証画面が表示されます。ここで「AUTHENTIOCATION_PASS」に指定した文字列と同じものを入力します。  
+コードをデプロイした際に表示された、index.htmlのURLにブラウザでアクセスして下さい。   
+例えば、こちらです。  xxxxxxの部分はデプロイした人ごとに異なります。    
 https://twilio-browser-phone-demo-xxxxxx-dev.twil.io/index.html  
+![image](./images/2.png)  
+2. トップ画面が表示されます。    
 ![image](./images/1.png)  
-2. 電話番号欄に、架電先の電話番号を入れます。番号は＋から始まるE164形式で入れて下さい。  
-3. Callボタンを押して下さい  
-4. 通話が開始され、画面下部の文字起こしメッセージ欄に会話が表示されれば成功です。  
+3. 電話番号欄に、架電先の電話番号を入れます。番号は＋から始まるE164形式で入れて下さい。  
+4. Callボタンを押して下さい  
+5. 通話が開始され、画面下部の文字起こしメッセージ欄に会話が表示されれば成功です。  
