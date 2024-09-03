@@ -114,7 +114,8 @@ Twilio-Browser-Phone-Demo
     ```    
     2.  コードをTwilioのFunctions&Assetsにデプロイ  
     ```shell-session
-    $ twilio serverless:deploy
+    $ twilio serverless:deploy  
+      
     (実行結果)
     ✔ Serverless project successfully deployed
     Deployment Details
@@ -141,7 +142,7 @@ Twilio-Browser-Phone-Demo
 11. TwiML Binの修正　　
    1. コンソールから、Twiml Binsのメニューをクリックしてください　   
    2. 先ほど作成した「Twilio-Browser-Phone-Demo」をクリックして下さい
-   3.  TWIML欄に下記のコードが表示されているとおもいます。
+   3.  TWIML欄に下記のコードが表示されているとおもいます。  
     ```xml  
     <?xml version="1.0" encoding="UTF-8"?>  
     <Response>  
