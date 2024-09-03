@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ブラウザ電話デモ</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" src="//media.twiliocdn.com/sdk/js/sync/v3.2/twilio-sync.min.js"></script>
+  
+    <style>
+        /* ページ全体のスタイル設定 */
+        body {
+            background-color: #ffffff; /* 背景を白に設定 */
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #333;
+            text-align: center;
+            padding: 50px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            border: 2px solid #d4c1f6; /* 紫色のボーダー */
+        }
+        /* 電話番号入力フィールドのスタイル */
+        #phone-number {
+            padding: 15px;
+            font-size: 18px;
+            width: 100%;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #controls {
+            margin-top: 20px;
+        }
+        /* コールボタンとハングアップボタンのスタイル */
+        #call-button, #hangup-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background-color 0.3s ease;
+        }
+        #call-button {
+            background-color: #6f42c1; /* 紫色 */
+            color: white;
+        }
+        #call-button:hover {
+            background-color: #5a32a3; /* 濃い紫色 */
+        }
+        #hangup-button {
+            background-color: #dc3545; /* 赤色 */
+            color: white;
+            display: none; /* 初期状態で非表示 */
+        }
+        #hangup-button:hover {
+            background-color: #c82333; /* 濃い赤色 */
+        }
+        #status {
+            margin-top: 30px;
+            font-size: 20px;
+            color: #555;
+        }
+
+        /* メッセージ表示エリアのスタイル */
+        .message-container {
+            height: 400px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .message {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+        .message.inbound {
+            align-items: flex-start;
+        }
+        .message.outbound {
+            align-items: flex-end;
+        }
+        .message .content {
+            max-width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .message.inbound .content {
+            background-color: #f8d7da; /* 赤色のアクセント */
+        }
+        .message.outbound .content {
+            background-color: #d1e7dd; /* 紫色のアクセント */
+        }
+        .message .label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        /* ラベルのスタイル */
+        label {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: block; /* ブロック要素にしてスペースを確保 */
+            color: #6f42c1; /* 紫色 */
+            text-align: left; /* 左寄せ */
+        }
+        /* ステータス表示のスタイル */
+        #status {
+            margin-top: 30px;
+            font-size: 20px;
+            color: #555;
+            background-color: #f8f9fa; /* 薄いグレー */
+            padding: 15px; /* 内側の余白 */
+            border-radius: 5px; /* 角を丸くする */
+            display: inline-block; /* ブロック要素として表示 */
+        }
+    </style>
+</head>
+<body>
+
+    <img src="logo.png" alt="ブラウザ電話デモ" style="max-width: 100%; height: auto;margin-bottom: 20px;" />
+    <!-- 電話番号入力フィールド -->
+    <label for="phone-number">電話番号:</label>
+    <input type="text" id="phone-number" placeholder="Enter phone number" />
+
+    <div id="controls">
+        <!-- コールボタン -->
+        <button id="call-button">Call</button>
+        <!-- ハングアップボタン -->
+        <button id="hangup-button">Hang Up</button>
+    </div>
+
+    <!-- ステータス表示 -->
+    <div id="status">Status: Ready</div>
+    <!-- Webhookデータ表示エリア -->
+    <label for="webhook-data-container">文字起こしメッセージ:</label>
+    <div id="webhook-data-container" class="message-container">
+        <!-- Webhookデータがここに表示されます -->
+    </div>
+  
+    <script src="//media.twiliocdn.com/sdk/js/client/v1.13/twilio.min.js"></script>
+    <script>
+        let device;
+        let callStatus = document.getElementById('status');
+        let callButton = document.getElementById('call-button');
+        let hangupButton = document.getElementById('hangup-button');
+
+        // Twilio Deviceのセットアップ関数
+        function setupDevice(token) {
+            device = new Twilio.Device(token);
+
+            // デバイスが準備完了した時の処理
+            device.on('ready', function() {
+                callStatus.textContent = 'Status: Ready';
+            });
+
+            // エラー発生時の処理
+            device.on('error', function(error) {
+                callStatus.textContent = 'Status: Error - ' + error.message;
+            });
+
+            // 通話接続時の処理
+            device.on('connect', function(conn) {
+                callStatus.textContent = 'Status: In Call';
+                callButton.style.display = 'none';
+                hangupButton.style.display = 'inline-block';
+            });
+
+            // 通話終了時の処理
+            device.on('disconnect', function(conn) {
+                callStatus.textContent = 'Status: Call Ended';
+                callButton.style.display = 'inline-block';
+                hangupButton.style.display = 'none';
+            });
+        }
+
+        // Twilioトークンを取得し、デバイスをセットアップする関数
+        function getTokenAndSetup() {
+            const vocie_token_url = '/voice-token';
+            fetch(vocie_token_url)
+                .then(response => response.json())
+                .then(data => setupDevice(data.token))
+                .catch(error => {
+                    callStatus.textContent = 'Status: Error - ' + error.message;
+                });
+        }
+
+        // コールボタンがクリックされた時の処理
+        callButton.onclick = function() {
+            const params = { To: document.getElementById('phone-number').value };
+            device.connect(params);
+        };
+
+        // ハングアップボタンがクリックされた時の処理
+        hangupButton.onclick = function() {
+            device.disconnectAll();
+        };
+
+        // ページロード時にトークンを取得してデバイスをセットアップ
+        getTokenAndSetup();
+
+        // 通話文字起こし関連の処理
+        const displayedData = new Set();
+
+        // メッセージエリアをスクロールの最下部に移動させる関数
+        function scrollToBottom() {
+            const container = document.getElementById('webhook-data-container');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // 新しいメッセージを表示する関数
+        function addMessage(data) {
+            console.log('Adding message:', data); // デバッグ用ログ
+            const track = data.track;
+            const dataString = data.transcript;
+            const label = track === 'inbound_track' ? 'Inbound' : 'Outbound';
+            
+            // 表示済みデータに追加
+            displayedData.add(dataString);
+            const webhookDataContainer = document.getElementById('webhook-data-container');
+            const newDataDiv = document.createElement('div');
+            newDataDiv.className = `message ${track === 'inbound_track' ? 'inbound' : 'outbound'}`;
+            newDataDiv.innerHTML = `<div class="label">${label}</div><div class="content">${dataString}</div>`;
+            webhookDataContainer.appendChild(newDataDiv);
+
+            // メッセージエリアを最下部にスクロール
+            scrollToBottom();
+        }
+
+        // Syncクライアントの初期化とドキュメントの監視
+        fetch('/sync-token')
+        .then(response => response.json())
+        .then(data => {
+            const syncClient = new Twilio.Sync.Client(data.token);
+            
+            syncClient.document('Twilio-Browser-Phone-Demo-Transcription').then(doc => {
+            console.log('Initial Sync data:', doc.data); // デバッグ用ログ
+            // 初期データの表示
+            if (doc.data && doc.data.transcript) {
+                addMessage(doc.data);
+            }
+
+            // データの変更を監視
+            doc.on('updated', event => {
+                console.log('Sync document updated:', event.data); // デバッグ用ログ
+                if (event.data && event.data.transcript) {
+                addMessage(event.data);
+                }
+            });
+            });
+        })
+        .catch(error => console.log('Error:', error));
+    </script>
+</body>
+</html>
