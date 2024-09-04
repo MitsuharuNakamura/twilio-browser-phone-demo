@@ -131,17 +131,17 @@ Twilio-Browser-Phone-Demo
     Runtime:
     node18
     View Live Logs:
-    https://www.twilio.com/console/functions/editor/ZS86ff05dad53e67160470087e4e839a22/environment/ZEdb3dd4975995d1f59cdb0391b0c8ce99
+    https://www.twilio.com/console/functions/editor/xxxxxxxxxx/environment/xxxxxxxxxx
     Functions:
-      https://twilio-browser-phone-demo-8112-dev.twil.io/authenticate
-      https://twilio-browser-phone-demo-8112-dev.twil.io/get-phone-numbers
-      https://twilio-browser-phone-demo-8112-dev.twil.io/sync-token
-      https://twilio-browser-phone-demo-8112-dev.twil.io/voice-call
-      https://twilio-browser-phone-demo-8112-dev.twil.io/voice-token
-      https://twilio-browser-phone-demo-8112-dev.twil.io/webhook
+      https://twilio-browser-xxxxxxxxxx.twil.io/authenticate
+      https://twilio-browser-xxxxxxxxxx.twil.io/get-phone-numbers
+      https://twilio-browser-xxxxxxxxxx.twil.io/sync-token
+      https://twilio-browser-xxxxxxxxxx.twil.io/voice-call
+      https://twilio-browser-xxxxxxxxxx.twil.io/voice-token
+      https://twilio-browser-xxxxxxxxxx.twil.io/webhook
     Assets:
-      https://twilio-browser-phone-demo-8112-dev.twil.io/index.html
-      https://twilio-browser-phone-demo-8112-dev.twil.io/logo.png
+      https://twilio-browser-xxxxxxxxxx.twil.io/index.html
+      https://twilio-browser-xxxxxxxxxx.twil.io/logo.png
     ```  
 
 10. TwiML Binの修正  
