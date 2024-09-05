@@ -6,8 +6,15 @@
 
 ## セットアップの仕方  
 1. Githubからコードをダウンロードしてローカルに展開  
+Requirements: Node 18 & [Twlio CLI & Twilio Serverless Toolkit](https://twilio.com/docs/labs/serverless-toolkit)
+
+```bash
+git clone git@github.com:MitsuharuNakamura/twilio-browser-phone-demo.git  
+cd twilio-browser-phone-demo  
+npm install  
+```
 <pre>
-Twilio-Browser-Phone-Demo
+twilio-browser-phone-demo  
    ├── assets/  
    │ ├── index.html  
    │ └── logo.png  
@@ -22,25 +29,25 @@ Twilio-Browser-Phone-Demo
    ├── .env.examples
    └── README.md  
 </pre>  
-1. プロジェクトの初期化  
+2. プロジェクトの初期化  
    `cd ./Twilio-Browser-Phone-Demo/`  
    `twilio serverless:init`  
 
-2. AccountSID/Auth_Tokenの取得
+3. AccountSID/Auth_Tokenの取得
    1. TwilioのコンソールにログインしてHOME画面の下部にあるAccountSID/AUTH_TOKENを確認してください。  
    2. ローカルに展開したファイルに.env.examplesがあるのでファイルを開きます。  
    3. ファイル内に、「ACCOUNT_SID」「AUTH_TOKEN」とあるので、コンソールから取得した値を入力し保存してください。   
    
-3. API Keyの作成   
+4. API Keyの作成   
    1. [公式サイト](https://www.twilio.com/docs/iam/api-keys#create-an-api-key)で作成手順を確認    
    2. ローカルに展開したファイルに.env.examplesがあるのでファイルを開きます。  
    3. ファイル内に、「API_KEY」「API_SECRET」とあるので、作成したAPIKEYの情報をそれぞれの変数に設定してください。     
 
-4. 電話番号の購入  
+5. 電話番号の購入  
    1. 電話番号を購入して下さい。手順は[こちら](https://help.twilio.com/articles/223135247)です。  
    2. 購入した電話番号をenv.examplesのファイル内にある「TWILIO_PHONE_NUMBER」に設定して下さい。番号は+で始まるE164形式で記載してください。  
 
-5. Syncの作成　　
+6. Syncの作成　　
    1. Sync Serviceの生成
       1. 管理コンソールからSyncのメニューにアクセスします。
       2. Syncメニューの下にServicesというサブメニューがあるのでクリックします。
@@ -63,7 +70,7 @@ Twilio-Browser-Phone-Demo
       1. 「SYNC_SERVICE_SID」には、SyncサービスのSID（ISxxxxxxxxxx）を入れて下さい
       2. 「SYNC_DOCUMENT_NAME」には、Syncのドキュメント名（Twilio-Browser-Phone-Demo-Transcription）を入れて下さい。  
 
-6. TwiML Binの作成　
+7. TwiML Binの作成　
    1. コンソールから、Twiml Binsのメニューをクリックしてください　   
    2. Create New TwiMLボタンを押して下さい。
    3. FRIENDLY NAMEには、「Twilio-Browser-Phone-Demo」と入力します。
@@ -91,13 +98,13 @@ Twilio-Browser-Phone-Demo
     ```  
     5. XML内に２箇所修正する必要があります。  
        1. <Functions_domain_name>　こちらは、コードをデプロイした後に修正するので現状はそのままでOK。  
-7. TwiML Appの設定　　
+8. TwiML Appの設定　　
    1. コンソールからVoice→Maange→TwiML appsに遷移します。
    2. Create New TwiML Appボタンをクリックします。
    3. Friendly Nameには任意の名前を入れて下さい。
    4. Voice ConfigurationのRequest URLには、先程作成したTwiML BinsのURLを指定してください。
    5. Twiml appsのSIDを.env.examplesのファイル内にある、「TWIML_APPLICATION_SID」に設定して下さい。  
-8.  コードの修正　　
+9.  コードの修正　　
     1.  index.htmlの下記箇所で、もしSyncのドキュメント名を手順と異なる値にしていた場合には、こちらの「Twilio-Browser-Phone-Demo-Transcription」を変更してください。  
     ```js  
         syncClient.document('Twilio-Browser-Phone-Demo-Transcription').then(doc => {  
@@ -106,10 +113,11 @@ Twilio-Browser-Phone-Demo
             if (doc.data && doc.data.transcript) {  
                 addMessage(doc.data);  
             }  
-    ```  
+ 
+   ```  
     2. env.examples内の「AUTHENTIOCATION_PASS」に任意の英数字をいれます。ここで指定したコードと画面から入力した認証コードが一致することで本機能を利用できます。
     3. ```.env.eample```ファイルのファイル名を、```.env```に変更してください。  
-9.  コードのデプロイ　　
+10.  コードのデプロイ　　
     1.  プロジェクトホームへ移動
     ```shell-session
     $ cd ./Twilio-Browser-Phone-Demo  
@@ -144,7 +152,7 @@ Twilio-Browser-Phone-Demo
       https://twilio-browser-xxxxxxxxxx.twil.io/logo.png
     ```  
 
-10. TwiML Binの修正  
+11. TwiML Binの修正  
     1. コンソールから、Twiml Binsのメニューをクリックしてください　   
     2. 先ほど作成した「Twilio-Browser-Phone-Demo」をクリックして下さい
     3. TWIML欄に下記のコードが表示されているとおもいます。  
