@@ -10,8 +10,6 @@ Requirements: Node 18 & [Twlio CLI & Twilio Serverless Toolkit](https://twilio.c
 
 ```bash
 git clone git@github.com:MitsuharuNakamura/twilio-browser-phone-demo.git  
-cd twilio-browser-phone-demo  
-npm install  
 ```
 <pre>
 twilio-browser-phone-demo  
@@ -29,10 +27,11 @@ twilio-browser-phone-demo
    ├── .env.examples
    └── README.md  
 </pre>  
-2. プロジェクトの初期化  
-   `cd ./Twilio-Browser-Phone-Demo/`  
-   `twilio serverless:init`  
-
+2. パッケージの導入  
+```bash
+cd twilio-browser-phone-demo  
+npm install  
+```
 3. AccountSID/Auth_Tokenの取得
    1. TwilioのコンソールにログインしてHOME画面の下部にあるAccountSID/AUTH_TOKENを確認してください。  
    2. ローカルに展開したファイルに.env.examplesがあるのでファイルを開きます。  
